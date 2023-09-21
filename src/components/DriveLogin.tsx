@@ -1,12 +1,14 @@
 import React from 'react';
 import { GoogleLogin } from 'react-google-login';
 
+
 interface DriveLoginProps {
   onSuccess: (token: string) => void;
 }
 
 const DriveLogin: React.FC<DriveLoginProps> = ({ onSuccess }) => {
   const responseGoogle = (response: any) => {
+      debugger
     if (response.accessToken) {
       onSuccess(response.accessToken);
     } else {

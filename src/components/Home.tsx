@@ -5,9 +5,9 @@ const Home: React.FC = () => {
   return (
     <div>
       <h1>Home Page</h1>
-      <Link to="/movies-at-2114/about">Go to About</Link>
+      <Link to="/about">Go to About</Link>
       <br />
-      <Link to="/movies-at-2114/drive-login">Login to Google Drive</Link> {/* Add this line */}
+      <Link to="/drive-login">Login to Google Drive</Link> {/* Add this line */}
     </div>
   );
 };
