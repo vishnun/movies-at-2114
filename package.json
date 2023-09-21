@@ -2,7 +2,7 @@
   "name": "movies-at-2114",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://vishnun.github.io/movies-at-2114",
+  "homepage": "https://vishnun.github.io/movies-at-2114/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "PUBLIC_URL=https://vishnun.github.io/movies-at-2114/ react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

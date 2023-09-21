@@ -15,11 +15,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/drive-login" element={<DriveLogin onSuccess={handleDriveLogin} />} />
+        <Route path="/movies-at-2114" element={<Home />} />
+        <Route path="/movies-at-2114/about" element={<About />} />
+        <Route path="/movies-at-2114/drive-login" element={<DriveLogin onSuccess={handleDriveLogin} />} />
         <Route
-          path="/drive-content"
+          path="/movies-at-2114/drive-content"
           element={accessToken ? <DriveContent accessToken={accessToken} /> : <DriveLogin onSuccess={handleDriveLogin} />}
         />
       </Routes>
