@@ -1,15 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
+import theme from "../theme";
+import {ThemeProvider} from "@mui/material";
+import Header from "./Header";
 
-const Home: React.FC = () => {
-  return (
-    <div>
-      <h1>Home Page</h1>
-      <Link to="/about">Go to About</Link>
-      <br />
-      <Link to="/drive-login">Login to Google Drive</Link> {/* Add this line */}
-    </div>
-  );
+const Home = () => {
+    return (
+        <ThemeProvider theme={theme}>
+            <div>
+                <Header/>
+                <h1>Home Page</h1>
+                <Link to="/about">Go to About</Link>
+            </div>
+        </ThemeProvider>
+    );
 };
 
 export default Home;
