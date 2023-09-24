@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from "./Header";
 import AddNewMovieForm from "./AddNewMovieForm";
-import {Container, Typography} from "@mui/material";
+import {Container, Grid, Typography} from "@mui/material";
 
 const onSubmit = (event: any, data: object) => {
     event.preventDefault();

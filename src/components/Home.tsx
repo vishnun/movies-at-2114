@@ -1,18 +1,19 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
 import theme from "../theme";
-import {ThemeProvider} from "@mui/material";
+import {Container, Grid, ThemeProvider, Typography} from "@mui/material";
 import Header from "./Header";
+import EncryptionExample from "./examples/EncryptionExample";
+import CreateSpreadsheetExample from "./examples/CreateSpreadsheetExample";
 
 const Home = () => {
     return (
-        <ThemeProvider theme={theme}>
-            <div>
-                <Header/>
-                <h1>Home Page</h1>
-                <Link to="/about">Go to About</Link>
-            </div>
-        </ThemeProvider>
+        <div>
+            <Header/>
+            <Container maxWidth='md'>
+                <EncryptionExample/>
+                <CreateSpreadsheetExample/>
+            </Container>
+        </div>
     );
 };
 

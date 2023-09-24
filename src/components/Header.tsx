@@ -1,6 +1,4 @@
-import React, {useState, useEffect} from 'react';
-import {googleLogout, useGoogleLogin} from '@react-oauth/google';
-import axios from 'axios';
+import React, {useState} from 'react';
 import logo from '../2114-logo.png'
 import theme from '../theme';
 import {
@@ -20,20 +18,12 @@ import {
 } from "@mui/material";
 import {grey} from '@mui/material/colors';
 import MenuIcon from '@mui/icons-material/Menu';
-import AdbIcon from '@mui/icons-material/Adb';
 import GoogleIcon from '@mui/icons-material/Google';
 import {Link} from "react-router-dom";
+import {useAuth} from "./contexts/AuthContext";
 
 const pages = ['Movies', 'Watch Now'];
 const settings = ['Profile', 'Dashboard', 'Logout']
-
-// Define a type for the user profile
-type UserProfile = {
-    picture: string;
-    name: string;
-    email: string;
-    // Add other profile properties if needed
-};
 
 const LoginButton = styled(Button)<ButtonProps>(({theme}) => ({
     color: theme.palette.getContrastText(grey[50]),
@@ -44,38 +34,10 @@ const LoginButton = styled(Button)<ButtonProps>(({theme}) => ({
 }));
 
 function Header() {
-    const [user, setUser] = useState<any>(null); // Use 'any' temporarily
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const {authenticated, user, profile, signIn, signOut} = useAuth();
 
-    const login = useGoogleLogin({
-        onSuccess: (codeResponse) => setUser(codeResponse),
-        onError: (error) => console.log('Login Failed:', error)
-    });
-
-    useEffect(() => {
-        if (user && user.access_token) {
-            axios
-                .get('https://www.googleapis.com/oauth2/v3/userinfo', {
-                    headers: {
-                        Authorization: `Bearer ${user.access_token}`,
-                        Accept: 'application/json'
-                    }
-                })
-                .then((res) => {
-                    setProfile(res.data as UserProfile);
-                })
-                .catch((err) => console.log(err));
-        }
-    }, [user]);
-
-    // log out function to log the user out of Google and set the profile to null
-    const logOut = () => {
-        googleLogout();
-        setProfile(null);
-    };
-
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+    const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -90,7 +52,7 @@ function Header() {
 
     const handleCloseUserMenu = (setting: any) => {
         if (setting === 'Logout') {
-            logOut();
+            signOut();
         }
         setAnchorElUser(null);
     };
@@ -190,7 +152,7 @@ function Header() {
                             )}
                             {!profile && (
                                 <LoginButton startIcon={<GoogleIcon/>} variant="contained" color="primary"
-                                             onClick={() => login()}>Sign in</LoginButton>
+                                             onClick={() => signIn()}>Sign in</LoginButton>
                             )}
                         </Toolbar>
                     </Container>
