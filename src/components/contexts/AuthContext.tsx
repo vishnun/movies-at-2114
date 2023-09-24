@@ -76,9 +76,15 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         console.log('Login Failed:', error);
     };
 
+    const googleSignInScopes = [
+        'https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/spreadsheets.readonly',
+    ];
+
     const signIn = useGoogleLogin({
         onSuccess,
         onError,
+        scope: googleSignInScopes.join(' '),
         // Add other options as needed (e.g., scope, state, etc.)
     });
 
