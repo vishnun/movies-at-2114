@@ -11,7 +11,7 @@ const loadLibrary = (path: string, callback: () => void) => {
 };
 
 async function initializeGapiClient() {
-    const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+    const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4'
 
     await gapi.client.init({
         apiKey: credentials.api_key,

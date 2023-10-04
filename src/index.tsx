@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './loadGoogleLibraries';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import './index.css';
-import './loadGoogleLibraries';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
