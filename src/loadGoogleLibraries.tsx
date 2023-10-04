@@ -30,8 +30,11 @@ loadLibrary(googleApiLibraryPath, gapiLoaded);
 
 function gisLoaded() {
     const SCOPES = [
-        'https://www.googleapis.com/auth/drive.file'
-        , 'https://www.googleapis.com/auth/spreadsheets.readonly'
+        'openid',
+        'profile',
+        'email',
+        'https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/spreadsheets.readonly'
     ].join(' ');
     let emptyCallback = () => void 0;
     tokenClient = google.accounts.oauth2.initTokenClient({

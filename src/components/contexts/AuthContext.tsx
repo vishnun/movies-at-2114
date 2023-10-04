@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {googleLogout, TokenResponse, useGoogleLogin} from '@react-oauth/google';
+import {tokenClient} from "../../loadGoogleLibraries";
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const USER_LOCAL_STORAGE_KEY = 'userAuthInfo'; // Key to store authentication info in localStorage
@@ -45,7 +46,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             const profileData = parsedAuthInfo.profileData;
             setProfile(profileData.profile);
         }
-    }, []);
+    }, [authenticated]);
 
 
     // Function to save authentication info to localStorage
@@ -63,6 +64,30 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     ) => {
         const authInfo = {profileData};
         localStorage.setItem(PROFILE_LOCAL_STORAGE_KEY, JSON.stringify(authInfo));
+    };
+
+    const fetchUserProfile = async () => {
+        try {
+            const token = gapi.client.getToken()
+            if (token !== null) {
+                // Fetch user profile data using the access token
+                const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: {
+                        Authorization: `Bearer ${token.access_token}`,
+                        Accept: 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setProfile(data as UserProfile);
+                    saveProfileAuthInfoToStorage({profile: data as UserProfile});
+                }
+            }
+        } catch (error) {
+            // Handle any errors that occur during profile data fetch
+            console.error('Error fetching user profile:', error);
+        }
     };
 
     const onSuccess = (codeResponse: Omit<TokenResponse, "error">) => {
@@ -85,62 +110,42 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         onSuccess,
         onError,
         scope: googleSignInScopes.join(' '),
-        // Add other options as needed (e.g., scope, state, etc.)
     });
 
 
+    // useEffect(() => {
+    //     // Check if the user is already authenticated on page load
+    //     const checkAuthentication = async () => {
+    //         try {
+    //             // Use the login function to initiate the Google OAuth flow
+    //             await signIn();
+    //
+    //             // Update the 'authenticated' state if the login was successful
+    //             setAuthenticated(true);
+    //         } catch (error) {
+    //             // Handle any errors that occur during authentication check
+    //             console.error('Error checking authentication:', error);
+    //         }
+    //     };
+    //
+    //     checkAuthentication().then(r => console.log(r));
+    // }, [signIn]);
+
     useEffect(() => {
-        // Check if the user is already authenticated on page load
-        const checkAuthentication = async () => {
-            try {
-                // Use the login function to initiate the Google OAuth flow
-                await signIn();
-
-                // Update the 'authenticated' state if the login was successful
-                setAuthenticated(true);
-            } catch (error) {
-                // Handle any errors that occur during authentication check
-                console.error('Error checking authentication:', error);
-            }
-        };
-
-        checkAuthentication().then(r => console.log(r));
-    }, [signIn]);
-
-    useEffect(() => {
-        // Fetch user profile data when the user is authenticated
-        const fetchUserProfile = async () => {
-            try {
-                if (user && user.access_token) {
-                    // Fetch user profile data using the access token
-                    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                        headers: {
-                            Authorization: `Bearer ${user.access_token}`,
-                            Accept: 'application/json',
-                        },
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        setProfile(data as UserProfile);
-                        saveProfileAuthInfoToStorage({profile: data as UserProfile});
-                    }
-                }
-            } catch (error) {
-                // Handle any errors that occur during profile data fetch
-                console.error('Error fetching user profile:', error);
-            }
-        };
-
-        // Fetch user profile data when the user is authenticated
         if (authenticated) {
-            fetchUserProfile().then(r => console.log(r));
+            fetchUserProfile().then(r => void 0);
         }
-    }, [authenticated, signIn])
+    }, [authenticated])
 
     const signOut = () => {
         localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
         localStorage.removeItem(PROFILE_LOCAL_STORAGE_KEY);
+
+        const token = gapi.client.getToken();
+        if (token !== null) {
+            // google.accounts.oauth2.revoke(token.access_token, () => void 0);
+            gapi.client.setToken(null);
+        }
 
         googleLogout();
         setAuthenticated(false);
