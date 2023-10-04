@@ -7,8 +7,7 @@ const EncryptionExample = () => {
     const [plainText, setPlainText] = useState('');
     const [encryptedText, setEncryptedText] = useState('');
     const [decryptedText, setDecryptedText] = useState('');
-
-    const secretKey = 'magic-masala';
+    const [secretKey, setSecretKey] = useState('magic-masala');
 
     const handleEncrypt = () => {
         const ciphertext = CryptoJS.AES.encrypt(plainText, secretKey).toString();
@@ -25,6 +24,12 @@ const EncryptionExample = () => {
             <Grid item>
                 <div>
                     <h2>Encryption using Crypto-JS Example</h2>
+                    <div>
+                        <label>Enter SecretKey: </label>
+                        <input type="text" value={secretKey} onChange={(e) => setSecretKey(e.target.value)}/>
+                        <br/>
+                    </div>
+                    <br/>
                     <div>
                         <label>Enter Text: </label>
                         <input type="text" value={plainText} onChange={(e) => setPlainText(e.target.value)}/>
