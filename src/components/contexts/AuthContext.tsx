@@ -30,24 +30,26 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     // Load authentication info from localStorage on component initialization
     useEffect(() => {
         const savedUserAuthInfo = localStorage.getItem(USER_LOCAL_STORAGE_KEY);
+        let isAuthenticated, userData;
         if (savedUserAuthInfo) {
             const parsedAuthInfo = JSON.parse(savedUserAuthInfo);
-            const {isAuthenticated, userData} = parsedAuthInfo.isAuthenticated;
+            isAuthenticated = parsedAuthInfo.isAuthenticated;
+            userData = parsedAuthInfo.userData;
 
             if (isAuthenticated) {
                 setAuthenticated(true);
                 setUser(userData.user);
+                gapi.client.setToken(userData.user);
             }
         }
 
         const savedProfileAuthInfo = localStorage.getItem(PROFILE_LOCAL_STORAGE_KEY);
-        if (savedProfileAuthInfo) {
+        if (isAuthenticated && savedProfileAuthInfo) {
             const parsedAuthInfo = JSON.parse(savedProfileAuthInfo);
             const profileData = parsedAuthInfo.profileData;
             setProfile(profileData.profile);
         }
     }, [authenticated]);
-
 
     // Function to save authentication info to localStorage
     const saveUserAuthInfoToStorage = (
@@ -94,6 +96,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         setUser(codeResponse);
         setAuthenticated(true);
         saveUserAuthInfoToStorage(true, {user: codeResponse});
+        fetchUserProfile().then(r => void 0);
     };
 
     const onError = (error: Pick<TokenResponse, "error">) => {
@@ -111,31 +114,6 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         onError,
         scope: googleSignInScopes.join(' '),
     });
-
-
-    // useEffect(() => {
-    //     // Check if the user is already authenticated on page load
-    //     const checkAuthentication = async () => {
-    //         try {
-    //             // Use the login function to initiate the Google OAuth flow
-    //             await signIn();
-    //
-    //             // Update the 'authenticated' state if the login was successful
-    //             setAuthenticated(true);
-    //         } catch (error) {
-    //             // Handle any errors that occur during authentication check
-    //             console.error('Error checking authentication:', error);
-    //         }
-    //     };
-    //
-    //     checkAuthentication().then(r => console.log(r));
-    // }, [signIn]);
-
-    useEffect(() => {
-        if (authenticated) {
-            fetchUserProfile().then(r => void 0);
-        }
-    }, [authenticated])
 
     const signOut = () => {
         localStorage.removeItem(USER_LOCAL_STORAGE_KEY);

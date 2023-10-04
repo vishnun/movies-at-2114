@@ -8,7 +8,7 @@ const EncryptionExample = () => {
     const [encryptedText, setEncryptedText] = useState('');
     const [decryptedText, setDecryptedText] = useState('');
 
-    const secretKey = 'YourSecretKey';
+    const secretKey = 'magic-masala';
 
     const handleEncrypt = () => {
         const ciphertext = CryptoJS.AES.encrypt(plainText, secretKey).toString();
@@ -28,9 +28,16 @@ const EncryptionExample = () => {
                     <div>
                         <label>Enter Text: </label>
                         <input type="text" value={plainText} onChange={(e) => setPlainText(e.target.value)}/>
-                    </div>
-                    <div>
+                        <br/>
                         <button onClick={handleEncrypt}>Encrypt</button>
+                    </div>
+                    <br/>
+                    <div>
+                        <div>
+                            <label>Enter Encrypted Text: </label>
+                            <input type="text" value={encryptedText} onChange={(e) => setEncryptedText(e.target.value)}/>
+                        </div>
+                        <br/>
                         <button onClick={handleDecrypt}>Decrypt</button>
                     </div>
                     <div>
