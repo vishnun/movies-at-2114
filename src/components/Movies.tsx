@@ -1,7 +1,9 @@
 import React from 'react';
 import Header from "./Header";
 import AddNewMovieForm from "./AddNewMovieForm";
-import {Container, Grid, Typography} from "@mui/material";
+import {Container, Divider, Grid, List, ListItem, Typography} from "@mui/material";
+import {useGoogleSheets} from "./contexts/GoogleSheetsContext";
+import MovieCard from "./MovieCard";
 
 const onSubmit = (event: any, data: object) => {
     event.preventDefault();
@@ -27,6 +29,9 @@ const onSubmit = (event: any, data: object) => {
 };
 
 const Movies = () => {
+    const {moviesData} = useGoogleSheets();
+
+    const movies = moviesData("test", "test");
     return (
         <div>
             <Header/>
@@ -36,6 +41,14 @@ const Movies = () => {
                 </Typography>
 
                 <AddNewMovieForm formName={"Add a New Movie"} onSubmit={onSubmit}/>
+                <Divider> Movies </Divider>
+                <List sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}>
+                    {movies.map((movie: any) => (
+                        <ListItem>
+                            <MovieCard movie={movie}/>
+                        </ListItem>
+                    ))}
+                </List>
             </Container>
         </div>
     );

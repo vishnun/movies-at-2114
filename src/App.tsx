@@ -7,6 +7,7 @@ import {decrypt, encrypt} from "./components/modules/Encryption";
 import {loadGoogleLibraries} from "./loadGoogleLibraries";
 import {getUserEnteredPasscode, saveUserEnteredPasscode} from "./components/modules/LocalStorageManager";
 import FullPageModal from "./components/FullPageModal";
+import {GoogleSheetsProvider} from "./components/contexts/GoogleSheetsContext";
 
 function App() {
     const [open, setOpen] = React.useState(false);
@@ -48,12 +49,14 @@ function App() {
     return (
         (authorizedAccess) ? (
             <AuthProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/movies" element={<Movies/>}/>
-                    </Routes>
-                </Router>
+                <GoogleSheetsProvider>
+                    <Router>
+                        <Routes>
+                            <Route path="/" element={<Home/>}/>
+                            <Route path="/movies" element={<Movies/>}/>
+                        </Routes>
+                    </Router>
+                </GoogleSheetsProvider>
             </AuthProvider>
         ) : (
             <FullPageModal
