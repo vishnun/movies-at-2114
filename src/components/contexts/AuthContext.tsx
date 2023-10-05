@@ -1,10 +1,16 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
 import {googleLogout, TokenResponse, useGoogleLogin} from '@react-oauth/google';
-import {tokenClient} from "../../loadGoogleLibraries";
+import {
+    clearProfileInfo,
+    clearUserAuthInfo,
+    clearUserEnteredPasscode,
+    getProfileInfo,
+    getUserAuthInfo,
+    saveProfileInfo,
+    saveUserAuthInfo
+} from "../modules/LocalStorageManager";
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const USER_LOCAL_STORAGE_KEY = 'userAuthInfo'; // Key to store authentication info in localStorage
-const PROFILE_LOCAL_STORAGE_KEY = 'profileAuthInfo'; // Key to store authentication info in localStorage
 
 type UserProfile = {
     picture: string;
@@ -29,7 +35,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
 
     // Load authentication info from localStorage on component initialization
     useEffect(() => {
-        const savedUserAuthInfo = localStorage.getItem(USER_LOCAL_STORAGE_KEY);
+        const savedUserAuthInfo = getUserAuthInfo();
         let isAuthenticated, userData;
         if (savedUserAuthInfo) {
             const parsedAuthInfo = JSON.parse(savedUserAuthInfo);
@@ -39,11 +45,11 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             if (isAuthenticated) {
                 setAuthenticated(true);
                 setUser(userData.user);
-                gapi.client.setToken(userData.user);
+                gapi?.client?.setToken(userData.user);
             }
         }
 
-        const savedProfileAuthInfo = localStorage.getItem(PROFILE_LOCAL_STORAGE_KEY);
+        const savedProfileAuthInfo = getProfileInfo();
         if (isAuthenticated && savedProfileAuthInfo) {
             const parsedAuthInfo = JSON.parse(savedProfileAuthInfo);
             const profileData = parsedAuthInfo.profileData;
@@ -56,21 +62,24 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         isAuthenticated: boolean,
         userData?: { user: any }
     ) => {
-        const authInfo = {isAuthenticated, userData};
-        localStorage.setItem(USER_LOCAL_STORAGE_KEY, JSON.stringify(authInfo));
+        saveUserAuthInfo(isAuthenticated, userData);
     };
 
     // Function to save authentication info to localStorage
     const saveProfileAuthInfoToStorage = (
         profileData?: { profile: UserProfile }
     ) => {
-        const authInfo = {profileData};
-        localStorage.setItem(PROFILE_LOCAL_STORAGE_KEY, JSON.stringify(authInfo));
+        saveProfileInfo({profileData});
     };
 
     const fetchUserProfile = async () => {
+        if (!gapi?.client) {
+            return;
+        }
+
         try {
-            const token = gapi.client.getToken()
+            const token = gapi?.client?.getToken()
+
             if (token !== null) {
                 // Fetch user profile data using the access token
                 const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -116,13 +125,15 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     });
 
     const signOut = () => {
-        localStorage.removeItem(USER_LOCAL_STORAGE_KEY);
-        localStorage.removeItem(PROFILE_LOCAL_STORAGE_KEY);
+        clearUserAuthInfo()
+        clearUserEnteredPasscode();
+        clearProfileInfo();
 
-        const token = gapi.client.getToken();
+        const token = gapi?.client?.getToken();
+
         if (token !== null) {
             // google.accounts.oauth2.revoke(token.access_token, () => void 0);
-            gapi.client.setToken(null);
+            gapi?.client?.setToken(null);
         }
 
         googleLogout();

@@ -5,6 +5,8 @@ import Movies from "./components/Movies";
 import {AuthProvider} from "./components/contexts/AuthContext";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from "@mui/material";
 import {decrypt, encrypt} from "./components/modules/Encryption";
+import {loadGoogleLibraries} from "./loadGoogleLibraries";
+import {getUserEnteredPasscode, saveUserEnteredPasscode} from "./components/modules/LocalStorageManager";
 
 function App() {
     const [open, setOpen] = React.useState(false);
@@ -17,6 +19,8 @@ function App() {
         if (decrypt(encryptedInputValue, 'magic-masala') === decrypt(encryptedTest, 'magic-masala')) {
             setAuthorizedAccess(true);
             setOpen(false);
+            saveUserEnteredPasscode(inputValue);
+            loadGoogleLibraries();
         } else {
             setAuthorizedAccess(false);
             setOpen(true);
@@ -24,8 +28,21 @@ function App() {
     }
 
     useEffect(() => {
-        setOpen(!authorizedAccess);
-    }, [authorizedAccess]);
+        const savedUserEnteredSecret = getUserEnteredPasscode();
+        if (savedUserEnteredSecret) {
+            let encryptedTest = "U2FsdGVkX1/BJporcXlmP2AmVJhbHbu2raOcK/H9HLw=";
+            const encryptedInputValue = encrypt(savedUserEnteredSecret, 'magic-masala');
+            if (decrypt(encryptedInputValue, 'magic-masala') === decrypt(encryptedTest, 'magic-masala')) {
+                setOpen(false);
+                setAuthorizedAccess(true)
+            } else {
+                setOpen(true);
+                setAuthorizedAccess(false)
+            }
+        } else {
+            setOpen(true);
+        }
+    }, []);
 
     const handleInputChange = (event: any) => {
         setInputValue(event.target.value);
