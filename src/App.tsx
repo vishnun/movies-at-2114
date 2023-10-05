@@ -3,10 +3,10 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Home from "./components/Home";
 import Movies from "./components/Movies";
 import {AuthProvider} from "./components/contexts/AuthContext";
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from "@mui/material";
 import {decrypt, encrypt} from "./components/modules/Encryption";
 import {loadGoogleLibraries} from "./loadGoogleLibraries";
 import {getUserEnteredPasscode, saveUserEnteredPasscode} from "./components/modules/LocalStorageManager";
+import FullPageModal from "./components/FullPageModal";
 
 function App() {
     const [open, setOpen] = React.useState(false);
@@ -35,6 +35,7 @@ function App() {
             if (decrypt(encryptedInputValue, 'magic-masala') === decrypt(encryptedTest, 'magic-masala')) {
                 setOpen(false);
                 setAuthorizedAccess(true)
+                loadGoogleLibraries();
             } else {
                 setOpen(true);
                 setAuthorizedAccess(false)
@@ -43,10 +44,6 @@ function App() {
             setOpen(true);
         }
     }, []);
-
-    const handleInputChange = (event: any) => {
-        setInputValue(event.target.value);
-    }
 
     return (
         (authorizedAccess) ? (
@@ -59,26 +56,19 @@ function App() {
                 </Router>
             </AuthProvider>
         ) : (
-            <Dialog open={open}>
-                <DialogTitle>Secret Passcode Required</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        To enter this website, enter the secret passcode.
-                    </DialogContentText>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="secret-passcode"
-                        label="Secret Passcode"
-                        fullWidth
-                        variant="standard"
-                        onChange={handleInputChange}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleSubmit}>Submit</Button>
-                </DialogActions>
-            </Dialog>
+            <FullPageModal
+                title="Secret Passcode Required"
+                contextText="To enter this website, enter the secret passcode."
+                inputFieldOptions={{
+                    id: "secret-passcode",
+                    label: "Secret Passcode"
+                }}
+                open={open}
+                handleSubmit={handleSubmit}
+                handleInputChange={(event: any) => {
+                    setInputValue(event.target.value);
+                }}
+            />
         )
     );
 }
